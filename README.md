@@ -1,136 +1,141 @@
-# Spring Boot Scalekit Example App
+## Spring Boot Scalekit Example App
 
-A comprehensive Spring Boot application demonstrating full stack authentication using Scalekit.
+A simple Spring Boot app that shows how to add secure sign-in with Scalekit (OIDC). You can it as a starting point or as a reference to integrate enterprise-grade authentication.
 
-## 🚀 Features
+### 🚀 What this example includes
 
-- **OIDC Authentication**: Enterprise-grade authentication using Scalekit
-- **User Dashboard**: Protected dashboard with user information
-- **Secure Sessions**: Spring Security integration with OAuth2
-- **Responsive UI**: Bootstrap-based responsive design
-- **Token Management**: ID token display and management
+- **OIDC authentication**: Sign in with Scalekit
+- **Protected pages**: A dashboard that requires authentication
+- **Spring Security setup**: OAuth 2.0 client configuration
+- **Responsive UI**: Bootstrap-based layout
+- **Token visibility**: Example of showing ID token claims
 
 ## 📋 Prerequisites
 
-- Java 17 or higher
-- Maven 3.6+
-- Scalekit account with configured OIDC application
+- **Java 17 or higher**
+- **Maven 3.6+**
+- **Scalekit account** with an OIDC application
 
-## 🛠️ Setup Instructions
+## 🛠️ Quick start
 
-### 1. Clone and Navigate to Project
+### 1) Clone and open the project
 
 ```bash
 git clone <your-repo-url>
 cd springboot-example
 ```
 
-### 2. Configure Scalekit Settings
+### 2) Configure Scalekit
 
-Create or update `src/main/resources/application-local.properties` with your Scalekit configuration:
+Pick one method below.
+
+Method A — application-local.properties (recommended for local dev):
+
+Create or update `src/main/resources/application-local.properties`:
 
 ```properties
-# Replace these values with your actual Scalekit configuration
+# Replace placeholders with your values
 scalekit.env-url=https://your-env.scalekit.io
-scalekit.client-id=your_client_id_here
-scalekit.client-secret=your_client_secret_here
+scalekit.client-id=YOUR_CLIENT_ID
+scalekit.client-secret=YOUR_CLIENT_SECRET
 scalekit.redirect-uri=http://localhost:8080/auth/callback
 
-# Server Configuration (optional)
+# Optional server config
 server.port=8080
 ```
 
-### 3. Environment Variables (Alternative)
-
-You can also configure using environment variables:
+Method B — environment variables:
 
 ```bash
 export SCALEKIT_ENV_URL=https://your-env.scalekit.io
-export SCALEKIT_CLIENT_ID=your_client_id_here
-export SCALEKIT_CLIENT_SECRET=your_client_secret_here
+export SCALEKIT_CLIENT_ID=YOUR_CLIENT_ID
+export SCALEKIT_CLIENT_SECRET=YOUR_CLIENT_SECRET
 export SCALEKIT_REDIRECT_URI=http://localhost:8080/auth/callback
 ```
 
-### 4. Build and Run
+Important:
+
+- Never commit secrets to source control.
+- Ensure the redirect URI exactly matches what is configured in Scalekit.
+
+### 3) Build and run
 
 ```bash
-# Build the application
+# Build
 mvn clean compile
 
-# Run the application
+# Run (default profile)
 mvn spring-boot:run
 
-# Or run with specific profile
+# Or run with the local profile (uses application-local.properties)
 mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
 The application will start at `http://localhost:8080`
 
-## 🔧 Getting Your Scalekit Configuration
+## 🔧 Getting your Scalekit configuration
 
-To get your Scalekit configuration values:
+To find your required values:
 
-1. **Sign up/Login to Scalekit**: Visit [Scalekit Dashboard](https://scalekit.com)
+1. **Sign in to Scalekit**: Visit [Scalekit Dashboard](https://scalekit.com)
 
-2. **Create an Application**:
-   - Navigate to Applications section
-   - Click "Create Application"
-   - Choose "Web Application" type
+2. **Create an application**:
 
-3. **Get Configuration Values**:
-   - **Environment URL**: Found in your dashboard (e.g., `https://your-env.scalekit.io`)
-   - **Client ID**: Available in your application settings
-   - **Client Secret**: Generated in your application settings
-   - **Redirect URI**: Configure as `http://localhost:8080/auth/callback`
+   - Go to the Applications section
+   - Click Create Application
+   - Choose Web Application
 
-4. **Configure Allowed Redirect URIs**:
-   - Add `http://localhost:8080/auth/callback` to allowed redirect URIs
-   - Add `http://localhost:8080` to allowed post-logout redirect URIs
+3. **Copy configuration values**:
 
-## 🌐 Application Routes
+   - **Environment URL** (e.g., `https://your-env.scalekit.io`)
+   - **Client ID**
+   - **Client Secret**
+   - **Redirect URI**: `http://localhost:8080/auth/callback`
 
-| Route | Description | Authentication Required |
-|-------|-------------|----------------------|
-| `/` | Home page with login option | No |
-| `/login` | Custom login page | No |
-| `/dashboard` | User dashboard | Yes |
-| `/profile` | Complete user profile with claims | Yes |
-| `/oauth2/authorization/scalekit` | Initiate OIDC flow | No |
-| `/auth/callback` | OIDC callback endpoint | No |
-| `/logout` | Logout and session termination | Yes |
+4. **Allowed redirect URIs**:
+   - Add `http://localhost:8080/auth/callback`
+   - Optionally add `http://localhost:8080` as a post-logout redirect
 
+## 🌐 Application routes
 
+| Route                            | Description                 | Auth required |
+| -------------------------------- | --------------------------- | ------------- |
+| `/`                              | Home page with login option | No            |
+| `/login`                         | Custom login page           | No            |
+| `/dashboard`                     | Protected dashboard         | Yes           |
+| `/oauth2/authorization/scalekit` | Start the OIDC flow         | No            |
+| `/auth/callback`                 | OIDC callback               | No            |
+| `/logout`                        | Logout and end session      | Yes           |
 
+## 🚦 Test the app
 
-## 🚦 Testing the Application
-
-1. **Start the application** following the setup instructions
-2. **Visit** `http://localhost:8080`
-3. **Click** "Sign in with Scalekit"
-4. **Authenticate** using your configured identity provider
-5. **Explore** the dashboard and profile pages
-6. **Test logout** functionality
+1. Start the app (see Quick start)
+2. Visit `http://localhost:8080`
+3. Click Sign in with Scalekit
+4. Authenticate with your provider
+5. Open the dashboard and then try logout
 
 ## 📊 Troubleshooting
 
-### Common Issues
+### Common issues
 
-**Application won't start:**
-- Verify Java 17+ is installed: `java -version`
-- Check Maven installation: `mvn -version`
-- Ensure all dependencies are downloaded: `mvn dependency:resolve`
+**Application will not start**
 
-**Authentication fails:**
-- Verify Scalekit configuration values are correct
-- Check that redirect URI matches exactly (including port)
-- Confirm client ID and secret are valid
-- Review Scalekit application settings
+- Check Java: `java -version` (must be 17+)
+- Check Maven: `mvn -version`
+- Download dependencies: `mvn dependency:resolve`
+- Try a clean run: `mvn clean spring-boot:run`
 
+**Authentication fails**
 
+- Verify env URL, client ID, and client secret
+- Ensure the redirect URI matches exactly (including port)
+- Check allowed redirect URIs in Scalekit
+- Inspect logs (enable DEBUG below)
 
-### Debug Mode
+### Enable debug logging
 
-Enable debug logging by adding to `application.yml`:
+Add this to `src/main/resources/application.yml`:
 
 ```yaml
 logging:
@@ -140,7 +145,7 @@ logging:
     org.springframework.security.oauth2: TRACE
 ```
 
-## 🔍 Code Structure
+## 🔍 Code structure
 
 ```
 src/
@@ -160,26 +165,28 @@ src/
 │           ├── index.html                  # Home page
 │           ├── login.html                  # Login page
 │           ├── dashboard.html              # User dashboard
-│           └── profile.html                # User profile
+│           └── layout.html                 # Base layout
 └── test/                                   # Test files
 ```
 
 ## 📦 Dependencies
 
-- **Spring Boot 3.2.0**: Application framework
-- **Spring Security**: Authentication and authorization
-- **Spring OAuth2 Client**: OIDC client implementation
-- **Scalekit SDK 2.0.4**: Scalekit integration
-- **Thymeleaf**: Template engine
-- **Bootstrap 5.1.3**: UI framework (via CDN)
+- Spring Boot
+- Spring Security (OAuth 2.0 Client)
+- Scalekit SDK
+- Thymeleaf
+- Bootstrap (via CDN)
+
+See `pom.xml` for exact versions.
 
 ## 🤝 Support
 
-For issues related to:
-- **This demo application**: Check the troubleshooting section or create an issue
-- **Scalekit service**: Visit [Scalekit Documentation](https://docs.scalekit.com)
-- **Spring Boot**: Check [Spring Boot Documentation](https://spring.io/projects/spring-boot)
+For help:
+
+- **This demo**: See Troubleshooting above or open an issue
+- **Scalekit**: See the Docs: [Scalekit Documentation](https://docs.scalekit.com)
+- **Spring Boot**: See [Spring Boot Documentation](https://spring.io/projects/spring-boot)
 
 ## 📄 License
 
-This project is provided as a demonstration and learning resource. Please refer to individual dependency licenses for production use.
+This project is for demonstration and learning. Refer to dependency licenses for production use.
