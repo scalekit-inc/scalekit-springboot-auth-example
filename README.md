@@ -4,11 +4,11 @@ A simple Spring Boot app that shows how to add secure sign-in with Scalekit (OID
 
 ### 🚀 What this example includes
 
-- **OIDC authentication**: Sign in with Scalekit
-- **Protected pages**: A dashboard that requires authentication
-- **Spring Security setup**: OAuth 2.0 client configuration
-- **Responsive UI**: Bootstrap-based layout
-- **Token visibility**: Example of showing ID token claims
+- The app signs users in with Scalekit using the OpenID Connect (OIDC) authorization flow.
+- The `/dashboard` page is protected by Spring Security and redirects unauthenticated users to the login flow.
+- The security configuration shows how to register an OAuth 2.0 client and wire login, callback, and logout endpoints.
+- The Thymeleaf templates use Bootstrap classes so pages render well on desktop and mobile.
+- After login, the dashboard displays selected ID token claims to demonstrate how to access user information.
 
 ## 📋 Prerequisites
 
