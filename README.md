@@ -10,7 +10,7 @@ What this example includes:
 - The Thymeleaf templates use Bootstrap classes so pages render well on desktop and mobile.
 - After login, the dashboard displays selected ID token claims to demonstrate how to access user information.
 
-## Prerequisites
+### Prerequisites
 
 - Java 17 or later is installed.
 - Maven 3.6 or later is installed.
@@ -18,18 +18,11 @@ What this example includes:
 
 ## 🛠️ Quick start
 
-### 1) Clone and open the project
-
-```bash
-git clone <your-repo-url>
-cd springboot-example
-```
-
-### 2) Configure Scalekit
+### Configure Scalekit
 
 Pick one method below.
 
-Method A — application-local.properties (recommended for local dev):
+_Method A_ — application-local.properties (recommended for local dev):
 
 Create or update `src/main/resources/application-local.properties`:
 
@@ -44,7 +37,7 @@ scalekit.redirect-uri=http://localhost:8080/auth/callback
 server.port=8080
 ```
 
-Method B — environment variables:
+_Method B_ — environment variables:
 
 ```bash
 export SCALEKIT_ENV_URL=https://your-env.scalekit.io
@@ -58,7 +51,7 @@ Important:
 - Never commit secrets to source control.
 - Ensure the redirect URI exactly matches what is configured in Scalekit.
 
-### 3) Build and run
+### Build and run
 
 ```bash
 # Build
@@ -73,30 +66,23 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 
 The application will start at `http://localhost:8080`
 
-## 🔧 Getting your Scalekit configuration
+### Setup Scalekit
 
 To find your required values:
 
-1. **Sign in to Scalekit**: Visit [Scalekit Dashboard](https://scalekit.com)
+1.  Visit [Scalekit Dashboard](https://scalekit.com) and proceed to _Settings_
 
-2. **Create an application**:
+2.  Copy the API credentails
 
-   - Go to the Applications section
-   - Click Create Application
-   - Choose Web Application
+    - **Environment URL** (e.g., `https://your-env.scalekit.dev`)
+    - **Client ID**
+    - **Client Secret**
 
-3. **Copy configuration values**:
+3.  Authentication > Redirect URLs > Allowed redirect URIs:
+    - Add `http://localhost:8080/auth/callback`
+    - Optionally add `http://localhost:8080` as a post-logout redirect
 
-   - **Environment URL** (e.g., `https://your-env.scalekit.io`)
-   - **Client ID**
-   - **Client Secret**
-   - **Redirect URI**: `http://localhost:8080/auth/callback`
-
-4. **Allowed redirect URIs**:
-   - Add `http://localhost:8080/auth/callback`
-   - Optionally add `http://localhost:8080` as a post-logout redirect
-
-## 🌐 Application routes
+## Application routes
 
 | Route                            | Description                 | Auth required |
 | -------------------------------- | --------------------------- | ------------- |
@@ -107,7 +93,7 @@ To find your required values:
 | `/auth/callback`                 | OIDC callback               | No            |
 | `/logout`                        | Logout and end session      | Yes           |
 
-## 🚦 Test the app
+## 🚦 Try the app
 
 1. Start the app (see Quick start)
 2. Visit `http://localhost:8080`
@@ -115,25 +101,9 @@ To find your required values:
 4. Authenticate with your provider
 5. Open the dashboard and then try logout
 
-## 📊 Troubleshooting
+Stuck? [Contact us](https://docs.scalekit.com/support/contact-us/).
 
-### Common issues
-
-**Application will not start**
-
-- Check Java: `java -version` (must be 17+)
-- Check Maven: `mvn -version`
-- Download dependencies: `mvn dependency:resolve`
-- Try a clean run: `mvn clean spring-boot:run`
-
-**Authentication fails**
-
-- Verify env URL, client ID, and client secret
-- Ensure the redirect URI matches exactly (including port)
-- Check allowed redirect URIs in Scalekit
-- Inspect logs (enable DEBUG below)
-
-### Enable debug logging
+#### Enable debug logging
 
 Add this to `src/main/resources/application.yml`:
 
@@ -145,7 +115,7 @@ logging:
     org.springframework.security.oauth2: TRACE
 ```
 
-## 🔍 Code structure
+#### Code structure
 
 ```
 src/
@@ -169,7 +139,7 @@ src/
 └── test/                                   # Test files
 ```
 
-## 📦 Dependencies
+#### Dependencies
 
 - Spring Boot
 - Spring Security (OAuth 2.0 Client)
@@ -179,14 +149,11 @@ src/
 
 See `pom.xml` for exact versions.
 
-## 🤝 Support
+#### Support
 
-For help:
+- Read the Scalekit docs: [Documentation](https://docs.scalekit.com).
+- Read the Spring Boot docs: [Documentation](https://spring.io/projects/spring-boot).
 
-- **This demo**: See Troubleshooting above or open an issue
-- **Scalekit**: See the Docs: [Scalekit Documentation](https://docs.scalekit.com)
-- **Spring Boot**: See [Spring Boot Documentation](https://spring.io/projects/spring-boot)
-
-## 📄 License
+#### License 📄
 
 This project is for demonstration and learning. Refer to dependency licenses for production use.
