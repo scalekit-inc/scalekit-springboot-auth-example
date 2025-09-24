@@ -2,7 +2,7 @@
 
 A simple Spring Boot app that shows how to add secure sign-in with Scalekit (OIDC). You can it as a starting point or as a reference to integrate enterprise-grade authentication.
 
-### 🚀 What this example includes
+What this example includes:
 
 - The app signs users in with Scalekit using the OpenID Connect (OIDC) authorization flow.
 - The `/dashboard` page is protected by Spring Security and redirects unauthenticated users to the login flow.
@@ -10,11 +10,11 @@ A simple Spring Boot app that shows how to add secure sign-in with Scalekit (OID
 - The Thymeleaf templates use Bootstrap classes so pages render well on desktop and mobile.
 - After login, the dashboard displays selected ID token claims to demonstrate how to access user information.
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Java 17 or higher**
 - **Maven 3.6+**
-- **Scalekit account** with an OIDC application
+- **Scalekit account** with an OIDC application. [Sign up here](https://app.scalekit.com/).
 
 ## 🛠️ Quick start
 
