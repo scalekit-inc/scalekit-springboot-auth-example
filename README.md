@@ -1,6 +1,6 @@
-# Spring Boot Scalekit OIDC Demo
+# Spring Boot Scalekit Example App
 
-A comprehensive Spring Boot application demonstrating enterprise authentication using Scalekit's OIDC provider. This demo showcases user authentication, profile management, and secure session handling.
+A comprehensive Spring Boot application demonstrating full stack authentication using Scalekit.
 
 ## 🚀 Features
 
@@ -100,22 +100,8 @@ To get your Scalekit configuration values:
 | `/auth/callback` | OIDC callback endpoint | No |
 | `/logout` | Logout and session termination | Yes |
 
-## 🔒 Security Features
 
-- **OIDC Authentication**: Standards-compliant OpenID Connect flow
-- **Session Management**: Secure session handling with Spring Security
-- **CSRF Protection**: Built-in CSRF protection for forms
-- **Secure Logout**: Proper session invalidation and cleanup
-- **Route Protection**: Automatic protection of authenticated routes
 
-## 🎨 User Interface
-
-The application includes:
-- **Responsive Design**: Mobile-friendly Bootstrap UI
-- **Navigation**: Dynamic navigation based on authentication state
-- **Dashboard**: Clean overview of user information
-- **Profile Page**: Detailed view of OIDC claims and token information
-- **Token Viewer**: Raw JWT token display with copy functionality
 
 ## 🚦 Testing the Application
 
@@ -141,10 +127,7 @@ The application includes:
 - Confirm client ID and secret are valid
 - Review Scalekit application settings
 
-**Pages not loading:**
-- Check server port (default: 8080)
-- Verify no other applications are using the same port
-- Check application logs for errors
+
 
 ### Debug Mode
 
