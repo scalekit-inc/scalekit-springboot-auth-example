@@ -12,9 +12,9 @@ What this example includes:
 
 ## Prerequisites
 
-- **Java 17 or higher**
-- **Maven 3.6+**
-- **Scalekit account** with an OIDC application. [Sign up here](https://app.scalekit.com/).
+- Java 17 or later is installed.
+- Maven 3.6 or later is installed.
+- You have a Scalekit account with an OIDC application. [Sign up](https://app.scalekit.com/)
 
 ## 🛠️ Quick start
 
