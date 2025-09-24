@@ -1,4 +1,4 @@
-## Spring Boot Scalekit Example App
+## Spring Boot Scalekit Authentication Example
 
 A simple Spring Boot app that shows how to add secure sign-in with Scalekit (OIDC). You can it as a starting point or as a reference to integrate enterprise-grade authentication.
 
@@ -82,7 +82,7 @@ To find your required values:
     - Add `http://localhost:8080/auth/callback`
     - Optionally add `http://localhost:8080` as a post-logout redirect
 
-## Application routes
+### Application routes
 
 | Route                            | Description                 | Auth required |
 | -------------------------------- | --------------------------- | ------------- |
@@ -93,7 +93,7 @@ To find your required values:
 | `/auth/callback`                 | OIDC callback               | No            |
 | `/logout`                        | Logout and end session      | Yes           |
 
-## 🚦 Try the app
+### 🚦 Try the app
 
 1. Start the app (see Quick start)
 2. Visit `http://localhost:8080`
