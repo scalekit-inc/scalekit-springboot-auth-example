@@ -6,7 +6,6 @@ A comprehensive Spring Boot application demonstrating full stack authentication 
 
 - **OIDC Authentication**: Enterprise-grade authentication using Scalekit
 - **User Dashboard**: Protected dashboard with user information
-- **Profile Management**: Complete user profile with OIDC claims
 - **Secure Sessions**: Spring Security integration with OAuth2
 - **Responsive UI**: Bootstrap-based responsive design
 - **Token Management**: ID token display and management
@@ -23,7 +22,7 @@ A comprehensive Spring Boot application demonstrating full stack authentication 
 
 ```bash
 git clone <your-repo-url>
-cd springboot-scalekit
+cd springboot-example
 ```
 
 ### 2. Configure Scalekit Settings
