@@ -2,10 +2,11 @@ server:
   port: 8080
 
 scalekit:
-  env-url: ${SCALEKIT_ENV_URL:https://your-env.scalekit.io}
-  client-id: ${SCALEKIT_CLIENT_ID:your_client_id}
-  client-secret: ${SCALEKIT_CLIENT_SECRET:your_client_secret}
+  env-url: ${SCALEKIT_ENV_URL:https://your-env.scalekit.com}
+  client-id: ${SCALEKIT_CLIENT_ID:YOUR_CLIENT_ID}
+  client-secret: ${SCALEKIT_CLIENT_SECRET:YOUR_CLIENT_SECRET}
   redirect-uri: ${SCALEKIT_REDIRECT_URI:http://localhost:8080/login/oauth2/code/scalekit}
+  organization-id: ${SCALEKIT_ORGANIZATION_ID:YOUR_ORGANIZATION_ID}
 
 # OAuth2 configuration - only enabled when actual Scalekit credentials are provided
 # Uncomment and configure the section below with your actual Scalekit details
@@ -19,7 +20,7 @@ spring:
             client-secret: ${scalekit.client-secret}
             authorization-grant-type: authorization_code
             redirect-uri: ${scalekit.redirect-uri}
-            scope: openid,profile,email
+            scope: openid,profile,email,offline_access
             client-name: Scalekit
         provider:
           scalekit:

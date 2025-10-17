@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Session Management - Scalekit Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Scalekit Demo</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">Welcome, <span th:text="${currentUser?.fullName ?: 'User'}">User</span>!</span>
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/users">Users</a>
+                <a class="nav-link active" href="/sessions">Sessions</a>
+                <form class="d-inline" th:action="@{/logout}" method="post">
+                    <button class="btn btn-outline-light btn-sm ms-2" type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1>Session Management</h1>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${success}">Success message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}">Error message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Current Session Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Current Session</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${sessionInfo != null}">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>User Information</h6>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>User ID:</strong></td>
+                                            <td th:text="${sessionInfo['userId'] ?: 'N/A'}">user-id</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Email:</strong></td>
+                                            <td th:text="${sessionInfo['email'] ?: 'N/A'}">user@example.com</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Name:</strong></td>
+                                            <td th:text="${sessionInfo['name'] ?: 'N/A'}">User Name</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Token Information</h6>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Token Type:</strong></td>
+                                            <td th:text="${sessionInfo['tokenType'] ?: 'N/A'}">Bearer</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Scopes:</strong></td>
+                                            <td th:text="${sessionInfo['scopes'] ?: 'N/A'}">openid, profile, email</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Has Refresh Token:</strong></td>
+                                            <td>
+                                                <span th:if="${sessionInfo['hasRefreshToken']}" class="badge bg-success">Yes</span>
+                                                <span th:unless="${sessionInfo['hasRefreshToken']}" class="badge bg-warning">No</span>
+                                            </td>
+                                        </tr>
+                                        <tr th:if="${sessionInfo['hasRefreshToken']}">
+                                            <td><strong>Refresh Token Type:</strong></td>
+                                            <td th:text="${sessionInfo['refreshTokenType'] ?: 'N/A'}">Bearer</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Token Expiry Information -->
+                            <div th:if="${expiryInfo != null}" class="mt-4">
+                                <h6>Token Expiry Information</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <td><strong>Expires At:</strong></td>
+                                                <td th:text="${expiryInfo['expiresAt'] ?: 'N/A'}">2024-01-01T14:00:00Z</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Time Until Expiry:</strong></td>
+                                                <td th:text="${expiryInfo['expiryDisplay'] ?: 'N/A'}">2 hours</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="alert" th:classappend="${isTokenExpired} ? 'alert-danger' : (${isTokenExpiringSoon} ? 'alert-warning' : 'alert-success')">
+                                            <strong>Status:</strong>
+                                            <span th:if="${isTokenExpired}">Token has expired</span>
+                                            <span th:if="${isTokenExpiringSoon and not isTokenExpired}">Token expiring soon</span>
+                                            <span th:if="${not isTokenExpired and not isTokenExpiringSoon}">Token is valid</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Access Token (masked for security) -->
+                            <div class="mt-4">
+                                <h6>Access Token</h6>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" th:value="${sessionInfo['accessToken'] ?: 'N/A'}" readonly>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleTokenVisibility(this)">
+                                        <i class="bi bi-eye"></i> Show
+                                    </button>
+                                    <button class="btn btn-outline-primary" type="button" onclick="copyToken(this)">
+                                        <i class="bi bi-clipboard"></i> Copy
+                                    </button>
+                                </div>
+                                <small class="text-muted">Click "Show" to reveal the token, "Copy" to copy to clipboard (use with caution)</small>
+                            </div>
+
+                            <!-- Refresh Token (masked for security) -->
+                            <div th:if="${sessionInfo['hasRefreshToken']}" class="mt-4">
+                                <h6>Refresh Token</h6>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" th:value="${sessionInfo['refreshToken'] ?: 'N/A'}" readonly>
+                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleTokenVisibility(this)">
+                                        <i class="bi bi-eye"></i> Show
+                                    </button>
+                                    <button class="btn btn-outline-primary" type="button" onclick="copyToken(this)">
+                                        <i class="bi bi-clipboard"></i> Copy
+                                    </button>
+                                </div>
+                                <small class="text-muted">Click "Show" to reveal the refresh token, "Copy" to copy to clipboard (use with caution)</small>
+                            </div>
+                        </div>
+                        <div th:unless="${sessionInfo != null}">
+                            <div class="text-center py-4">
+                                <p class="text-muted">No session information available.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Session Actions -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Session Actions</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2 d-md-flex">
+                            <button class="btn btn-outline-warning" onclick="refreshSession()">Refresh Session Info</button>
+                            <button class="btn btn-outline-info" onclick="validateToken()">Validate Token</button>
+                            <form class="d-inline" th:action="@{/logout}" method="post">
+                                <button class="btn btn-outline-danger" type="submit">Logout & End Session</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleTokenVisibility(button) {
+            const input = button.previousElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.innerHTML = '<i class="bi bi-eye-slash"></i> Hide';
+            } else {
+                input.type = 'password';
+                button.innerHTML = '<i class="bi bi-eye"></i> Show';
+            }
+        }
+
+        function copyToken(button) {
+            const input = button.previousElementSibling.previousElementSibling;
+            input.select();
+            input.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand('copy');
+            
+            // Show feedback
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            button.classList.add('btn-success');
+            button.classList.remove('btn-outline-primary');
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.classList.remove('btn-success');
+                button.classList.add('btn-outline-primary');
+            }, 2000);
+        }
+
+        function validateToken() {
+            const button = event.target;
+            const originalText = button.innerHTML;
+            
+            // Show loading state
+            button.innerHTML = '<i class="bi bi-hourglass-split"></i> Validating...';
+            button.disabled = true;
+            
+            // Make API call to validate token
+            fetch('/sessions/validate-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    // Show success message with token details
+                    let message = '✅ Token is valid!\n\n';
+                    if (data.userId) message += `User ID: ${data.userId}\n`;
+                    if (data.email) message += `Email: ${data.email}\n`;
+                    if (data.name) message += `Name: ${data.name}\n`;
+                    if (data.exp) message += `Expires: ${new Date(data.exp * 1000).toLocaleString()}\n`;
+                    if (data.iss) message += `Issuer: ${data.iss}\n`;
+                    
+                    alert(message);
+                } else {
+                    // Show error message
+                    alert(`❌ Token validation failed!\n\nError: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Token validation error:', error);
+                alert('❌ Token validation failed!\n\nError: Unable to validate token. Please try again.');
+            })
+            .finally(() => {
+                // Restore button state
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        }
+
+        function refreshSession() {
+            const button = event.target;
+            const originalText = button.innerHTML;
+            
+            // Show loading state
+            button.innerHTML = '<i class="bi bi-hourglass-split"></i> Refreshing...';
+            button.disabled = true;
+            
+            // Make API call to refresh token
+            fetch('/sessions/refresh-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message with new token info
+                    let message = '✅ Tokens refreshed successfully!\n\n';
+                    if (data.newAccessToken) {
+                        message += `New Access Token: ${data.newAccessToken.substring(0, 20)}...\n`;
+                    }
+                    if (data.newRefreshToken) {
+                        message += `New Refresh Token: ${data.newRefreshToken.substring(0, 20)}...\n`;
+                    }
+                    if (data.tokensUpdatedInContext) {
+                        message += `\n✅ Tokens updated in session context`;
+                    } else {
+                        message += `\n⚠️ Tokens obtained but not updated in session context`;
+                    }
+                    if (data.note) {
+                        message += `\n\nNote: ${data.note}`;
+                    }
+                    
+                    alert(message);
+                    
+                    // Reload the page to show updated session info
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    // Show error message
+                    alert(`❌ Token refresh failed!\n\nError: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Token refresh error:', error);
+                alert('❌ Token refresh failed!\n\nError: Unable to refresh tokens. Please try again.');
+            })
+            .finally(() => {
+                // Restore button state
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        }
+
+        // Auto-refresh if token is expiring soon
+        document.addEventListener('DOMContentLoaded', function() {
+            const isExpiringSoon = /*[[${isTokenExpiringSoon}]]*/ false;
+            if (isExpiringSoon) {
+                setTimeout(function() {
+                    if (confirm('Your session is expiring soon. Would you like to refresh the page to check for updated tokens?')) {
+                        window.location.reload();
+                    }
+                }, 30000); // Show alert after 30 seconds
+            }
+        });
+    </script>
+</body>
+</html>
