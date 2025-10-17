@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details - Scalekit Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Scalekit Demo</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/users">Users</a>
+                <a class="nav-link" href="/sessions">Sessions</a>
+                <form class="d-inline" th:action="@{/logout}" method="post">
+                    <button class="btn btn-outline-light btn-sm ms-2" type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1>User Details</h1>
+                    <a href="/users" class="btn btn-outline-secondary">Back to Users</a>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${success}">Success message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}">Error message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <div th:if="${user != null}">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <!-- User Information -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">User Information</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-3"><strong>ID:</strong></div>
+                                        <div class="col-sm-9" th:text="${user.id}">user-id</div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-sm-3"><strong>Name:</strong></div>
+                                        <div class="col-sm-9" th:text="${user.name ?: 'N/A'}">User Name</div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-sm-3"><strong>Email:</strong></div>
+                                        <div class="col-sm-9" th:text="${user.email ?: 'N/A'}">user@example.com</div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-sm-3"><strong>Status:</strong></div>
+                                        <div class="col-sm-9">
+                                            <span th:if="${user.status == 'ACTIVE'}" class="badge bg-success">Active</span>
+                                            <span th:if="${user.status == 'PENDING'}" class="badge bg-warning">Pending</span>
+                                            <span th:if="${user.status == 'SUSPENDED'}" class="badge bg-danger">Suspended</span>
+                                            <span th:if="${user.status == null or user.status == ''}" class="badge bg-secondary">Unknown</span>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-sm-3"><strong>Created:</strong></div>
+                                        <div class="col-sm-9" th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00</div>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-sm-3"><strong>Last Updated:</strong></div>
+                                        <div class="col-sm-9" th:text="${#temporals.format(user.updatedAt, 'yyyy-MM-dd HH:mm:ss')}">2024-01-01 12:00:00</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- User Attributes -->
+                            <div class="card mt-4" th:if="${user.attributes != null and not user.attributes.isEmpty()}">
+                                <div class="card-header">
+                                    <h5 class="mb-0">User Attributes</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Attribute</th>
+                                                    <th>Value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr th:each="attr : ${user.attributes}">
+                                                    <td><code th:text="${attr.key}">attribute</code></td>
+                                                    <td th:text="${attr.value}">value</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <!-- Quick Actions -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Quick Actions</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#resendInviteModal">Resend Invite</button>
+                                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">Delete User</button>
+                                        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#removeMembershipModal">Remove Membership</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- User Statistics -->
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Statistics</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Status:</span>
+                                        <span th:if="${user.status == 'ACTIVE'}" class="text-success">Active</span>
+                                        <span th:if="${user.status == 'PENDING'}" class="text-warning">Pending</span>
+                                        <span th:if="${user.status == 'SUSPENDED'}" class="text-danger">Suspended</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${user != null}">
+                    <div class="alert alert-warning">
+                        <h4>User Not Found</h4>
+                        <p>The requested user could not be found.</p>
+                        <a href="/users" class="btn btn-primary">Back to Users</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Resend Invite Modal -->
+    <div class="modal fade" id="resendInviteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Resend Invitation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to resend the invitation email to this user?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form th:action="@{/users/{id}/resend-invite(id=${user.id})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-warning">Resend Invite</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete User Modal -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-danger"><strong>Warning:</strong> This action cannot be undone. The user will be permanently deleted.</p>
+                    <p>Are you sure you want to delete this user?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form th:action="@{/users/{id}/delete(id=${user.id})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger">Delete User</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove Membership Modal -->
+    <div class="modal fade" id="removeMembershipModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Remove Membership</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This will remove the user's membership from the organization but keep the user account.</p>
+                    <p>Are you sure you want to remove this user's membership?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form th:action="@{/users/{id}/delete-membership(id=${user.id})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-warning">Remove Membership</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

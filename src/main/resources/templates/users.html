@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Scalekit Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Scalekit Demo</a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">Welcome, <span th:text="${currentUser?.fullName ?: 'User'}">User</span>!</span>
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link active" href="/users">Users</a>
+                <a class="nav-link" href="/sessions">Sessions</a>
+                <form class="d-inline" th:action="@{/logout}" method="post">
+                    <button class="btn btn-outline-light btn-sm ms-2" type="submit">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1>User Management</h1>
+                    <a href="/users/create" class="btn btn-primary">Create User</a>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <span th:text="${success}">Success message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <span th:text="${error}">Error message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Users Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Organization Users</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${users != null and not #lists.isEmpty(users)}">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Last Login</th>
+                                            <th>Created</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="user : ${users}">
+                                            <td>
+                                                <strong th:text="${user.userProfile?.name ?: (user.userProfile?.firstName + ' ' + user.userProfile?.lastName) ?: 'N/A'}">User Name</strong>
+                                            </td>
+                                            <td th:text="${user.email ?: 'N/A'}">user@example.com</td>
+                                            <td th:text="${user.lastLogin != null ? user.lastLogin.toString() : 'Never'}">2024-01-01 12:00</td>
+                                            <td th:text="${user.createTime != null ? user.createTime.toString() : 'N/A'}">2024-01-01 12:00</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button type="button" class="btn btn-outline-danger delete-btn" 
+                                                            th:data-user-id="${user.id}"
+                                                            th:data-user-name="${user.userProfile?.name ?: user.email}">
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Pagination -->
+                            <div th:if="${hasNextPage}" class="d-flex justify-content-center mt-3">
+                                <a th:href="@{/users(pageSize=${pageSize}, pageToken=${nextPageToken})}" class="btn btn-outline-primary">Load More</a>
+                            </div>
+                        </div>
+                        <div th:unless="${users != null and not #lists.isEmpty(users)}">
+                            <div class="text-center py-4">
+                                <p class="text-muted">No users found in the organization.</p>
+                                <a href="/users/create" class="btn btn-primary">Create First User</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Delete User Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm User Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete user <strong id="userNameToDelete"></strong>?</p>
+                    <p class="text-danger"><small>This action cannot be undone.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteForm" method="post" style="display: inline;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        <button type="submit" class="btn btn-danger">Delete User</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function deleteUser(userId, userName) {
+            document.getElementById('userNameToDelete').textContent = userName;
+            document.getElementById('deleteForm').action = '/users/' + userId + '/delete';
+            
+            var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            deleteModal.show();
+        }
+        
+        // Add event listener for delete buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('delete-btn')) {
+                    const userId = e.target.getAttribute('data-user-id');
+                    const userName = e.target.getAttribute('data-user-name');
+                    deleteUser(userId, userName);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

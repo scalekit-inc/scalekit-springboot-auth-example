@@ -13,6 +13,8 @@
             <div class="navbar-nav ms-auto">
                 <span class="navbar-text me-3">Welcome, <span th:text="${name} ?: 'User'">User</span>!</span>
                 <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/users">Users</a>
+                <a class="nav-link" href="/sessions">Sessions</a>
                 <form class="d-inline" th:action="@{/logout}" method="post">
                     <button class="btn btn-outline-light btn-sm ms-2" type="submit">Logout</button>
                 </form>
@@ -98,6 +100,18 @@
                         <small class="text-muted d-block mt-2">
                             Session established: <span id="session-time"></span>
                         </small>
+                    </div>
+                </div>
+
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Management</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/users" class="btn btn-outline-primary btn-sm">User Management</a>
+                            <a href="/sessions" class="btn btn-outline-info btn-sm">Session Management</a>
+                        </div>
                     </div>
                 </div>
             </div>
