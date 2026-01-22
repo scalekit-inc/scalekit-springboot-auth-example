@@ -103,6 +103,12 @@ To find your required values:
 
 Stuck? [Contact us](https://docs.scalekit.com/support/contact-us/).
 
+#### HTTP timeouts configuration
+
+Spring Security's OAuth2 resource server fetches the JWKS from the issuer URL during JWT validation. If the issuer is unreachable, authentication requests will time out.
+
+Use the Spring Security JWT timeout settings for your Spring Boot version. Follow the recommended configuration in the Spring docs: [JWT decoder timeouts](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html#oauth2resourceserver-jwt-timeouts)
+
 #### Enable debug logging
 
 Add this to `src/main/resources/application.yml`:
