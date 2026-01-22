@@ -103,11 +103,13 @@ To find your required values:
 
 Stuck? [Contact us](https://docs.scalekit.com/support/contact-us/).
 
-#### HTTP timeouts configuration
+#### Troubleshooting: HTTP timeouts
 
-Spring Security's OAuth2 resource server fetches the JWKS from the issuer URL during JWT validation. If the issuer is unreachable, authentication requests will time out.
+**Symptom:** Login attempts fail intermittently, or JWT verification errors appear in the logs.
 
-Use the Spring Security JWT timeout settings for your Spring Boot version. Follow the recommended configuration in the Spring docs: [JWT decoder timeouts](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html#oauth2resourceserver-jwt-timeouts)
+**Cause:** Spring Security's OAuth2 resource server fetches the JWKS (JSON Web Key Set) from Scalekit during JWT validation. If network latency is high or the default timeout is too short, these requests can fail silently.
+
+**Solution:** Increase the HTTP timeout for JWT decoder operations. Spring Security provides configuration options that vary by Spring Boot version. See the official guide for your version: [JWT decoder timeouts](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html#oauth2resourceserver-jwt-timeouts)
 
 #### Enable debug logging
 
